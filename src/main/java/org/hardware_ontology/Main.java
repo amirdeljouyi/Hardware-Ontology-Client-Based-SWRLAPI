@@ -1,4 +1,4 @@
-package org.swrlapi.example;
+package org.hardware_ontology;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -12,54 +12,40 @@ import org.swrlapi.sqwrl.exceptions.SQWRLException;
 
 import java.io.File;
 import java.util.Optional;
+import java.util.Scanner;
 
-public class SWRLAPIExample
-{
-  public static void main(String[] args)
-  {
-    if (args.length > 1)
-      Usage();
+import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.stage.Stage;
+import javafx.scene.Scene;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.layout.BorderPane;
 
-    Optional<String> owlFilename = args.length == 0 ? Optional.<String>empty() : Optional.of(args[0]);
-    Optional<File> owlFile = (owlFilename != null && owlFilename.isPresent()) ?
-      Optional.of(new File(owlFilename.get())) :
-      Optional.<File>empty();
 
-    try {
-      // Create an OWL ontology using the OWLAPI
-      OWLOntologyManager ontologyManager = OWLManager.createOWLOntologyManager();
-      OWLOntology ontology = owlFile.isPresent() ?
-        ontologyManager.loadOntologyFromOntologyDocument(owlFile.get()) :
-        ontologyManager.createOntology();
-
-      // Create SQWRL query engine using the SWRLAPI
-      SQWRLQueryEngine queryEngine = SWRLAPIFactory.createSQWRLQueryEngine(ontology);
-
-      // Create and execute a SQWRL query using the SWRLAPI
-      SQWRLResult result = queryEngine.runSQWRLQuery("q1", "swrlb:add(?x, 2, 2) -> sqwrl:select(?x)");
-
-      // Process the SQWRL result
-      if (result.next())
-        System.out.println("x: " + result.getLiteral("x").getInteger());
-
-    } catch (OWLOntologyCreationException e) {
-      System.err.println("Error creating OWL ontology: " + e.getMessage());
-      System.exit(-1);
-    } catch (SWRLParseException e) {
-      System.err.println("Error parsing SWRL rule or SQWRL query: " + e.getMessage());
-      System.exit(-1);
-    } catch (SQWRLException e) {
-      System.err.println("Error running SWRL rule or SQWRL query: " + e.getMessage());
-      System.exit(-1);
-    } catch (RuntimeException e) {
-      System.err.println("Error starting application: " + e.getMessage());
-      System.exit(-1);
-    }
-  }
-
-  private static void Usage()
-  {
-    System.err.println("Usage: " + SWRLAPIExample.class.getName() + " [ <owlFileName> ]");
-    System.exit(1);
-  }
+public class Main extends Application {
+	@Override
+	public void start(Stage primaryStage) {
+		try {
+			VBox root = new VBox();
+			FXMLLoader loader = new FXMLLoader();
+			File resourcesDirectory = new File("src/main/resources");
+			loader.setLocation(Main.class.getResource("/Home.fxml"));
+			root = (VBox) loader.load();
+			Scene scene = new Scene(root);
+		    
+			scene.getStylesheets().add(getClass().getResource("/application.css").toExternalForm());
+			primaryStage.setResizable(false);
+			primaryStage.setScene(scene);
+			primaryStage.setTitle("Hardware");
+			primaryStage.centerOnScreen();
+			primaryStage.show();
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static void main(String[] args) {
+		launch(args);
+	}
 }
